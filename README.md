@@ -4,9 +4,12 @@ This tool allows a user to copy their profile settings between different account
 ## Usage
 - Download the EXE file from the releases page
 - After running the file, you'll see the below window
-![Image1](Images/image1.png)
+
+	![Image1](Images/image1.png)
+
 - Once you've selected a profile directory, a master core_user and/or master core_char file, and added at least 1 slave, you're good to hit copy!
-![Image2](Images/image2.png)
+
+	![Image2](Images/image2.png)
 
 ## FAQ
 - **What if I only want to copy across user or account settings, but not both?**
