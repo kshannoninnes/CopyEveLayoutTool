@@ -1,0 +1,91 @@
+﻿<Window x:Class="CopyEveLayoutTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CopyEveLayoutTool"
+        mc:Ignorable="d"
+        Title="CELT" Height="520" Width="330" Background="#FF23272A" ResizeMode="NoResize" Icon="celticknotlightest.ico">
+
+    <Grid x:Name="MainPanel" ScrollViewer.VerticalScrollBarVisibility="Disabled" Margin="10,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="90"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel x:Name="ProfDirPanel" Grid.Row="0" VerticalAlignment="Stretch" Orientation="Vertical" Margin="0,10,0,0">
+            <StackPanel x:Name="DirLabelPanel">
+                <Label Content="Profile Directory" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+            </StackPanel>
+            <Grid x:Name="DirTextBoxPanel" HorizontalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="25" Margin="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="30"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" x:Name="profDirText" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,1,0" IsReadOnly="True"/>
+                <Button Grid.Column="1" Content="..." ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch" Click="SelectProfileDirectory" Padding="0" Margin="1,0,0,0"/>
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Name="SourceProfPanel" Grid.Row="1" VerticalAlignment="Stretch" Orientation="Vertical">
+            <StackPanel x:Name="MasterProfPanel">
+                <Label Content="Master Profile" HorizontalAlignment="Center" Margin="0" Foreground="White" FontWeight="Bold"/>
+            </StackPanel>
+            <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="50" Orientation="Vertical">
+                <Grid Height="50" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2"/>
+                        <ColumnDefinition Width="30"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="2"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" Content="Core User" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1,0,0,0"/>
+                    <TextBox Name="coreUserMaster" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Margin="0"/>
+                    <Button Grid.Row="0" Grid.Column="3" Content="..." VerticalAlignment="Stretch" Width="29" Height="25" Click="SelectUserMaster"/>
+
+                    <Label Grid.Row="2" Grid.Column="0" Content="Core Char" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1,0,0,0"/>
+                    <TextBox Name="coreCharMaster" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Margin="0"/>
+                    <Button Grid.Row="2" Grid.Column="3" Content="..." VerticalAlignment="Stretch" Width="29" Height="25" Click="SelectCharMaster"/>
+                </Grid>
+            </StackPanel>
+        </StackPanel>
+
+        <Grid Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="29"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Content="Slave Profiles" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+
+            <ListView Grid.Row="1" Name="slaveListView" ItemsSource="{Binding FilesToOverwrite}" 
+                      Background="#FF23272A" Foreground="White" BorderThickness="1" 
+                      HorizontalContentAlignment="Center"
+                      SelectionMode="Single"/>
+
+            <Grid Grid.Row="2" Margin="0,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Add Slave" Click="AddSlave"/>
+                <Button Grid.Column="1" Content="Remove Slave" Click="RemoveSlave"/>
+                <Button Grid.Column="3" Content="Copy" Click="Copy"/>
+            </Grid>
+        </Grid>
+        <Border Grid.Row="3" BorderThickness="0,1,0,0" Margin="0,2,0,0" BorderBrush="#FF8F8585">
+            <TextBlock x:Name="errorLabel" HorizontalAlignment="Left" VerticalAlignment="Stretch" Foreground="Red" FontSize="10" FontStyle="Italic"/>
+        </Border>
+    </Grid>
+</Window>
