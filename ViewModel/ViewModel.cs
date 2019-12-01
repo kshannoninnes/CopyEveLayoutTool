@@ -21,6 +21,7 @@ namespace EveLayoutCopy.ViewModel
         }
 
 
+        // TODO Fix UpdateStatus
         // Properties
         public string InitialDirectory { get; }
         public string ProfileDirectory 
@@ -70,12 +71,13 @@ namespace EveLayoutCopy.ViewModel
 
 
         // Commands
-        private readonly DelegateCommand _spd;
+        private DelegateCommand _spd;
         public DelegateCommand SelectProfileDirectoryCommand
         {
             get
             {
-                return _spd ?? new DelegateCommand(SelectProfileDirectory);
+                _spd = _spd ?? new DelegateCommand(SelectProfileDirectory);
+                return _spd;
             }
         }
         private void SelectProfileDirectory()
@@ -88,12 +90,13 @@ namespace EveLayoutCopy.ViewModel
             }
         }
 
-        private readonly DelegateCommand _sum;
+        private DelegateCommand _sum;
         public DelegateCommand SelectUserMastercommand
         {
             get
             {
-                return _sum ?? new DelegateCommand(SelectUserMaster);
+                _sum = _sum ?? new DelegateCommand(SelectUserMaster);
+                return _sum;
             }
         }
         private void SelectUserMaster()
@@ -108,12 +111,13 @@ namespace EveLayoutCopy.ViewModel
             }
         }
 
-        private readonly DelegateCommand _scm;
+        private DelegateCommand _scm;
         public DelegateCommand SelectCharMasterCommand
         {
             get
             {
-                return _scm ?? new DelegateCommand(SelectCharMaster);
+                _scm = _scm ?? new DelegateCommand(SelectCharMaster);
+                return _scm;
             }
         }
         private void SelectCharMaster()
@@ -128,12 +132,13 @@ namespace EveLayoutCopy.ViewModel
             }
         }
 
-        private readonly DelegateCommand _as;
+        private DelegateCommand _as;
         public DelegateCommand AddSlaveCommand
         {
             get
             {
-                return _as ?? new DelegateCommand(AddSlave);
+                _as = _as ?? new DelegateCommand(AddSlave);
+                return _as;
             }
         }
         private void AddSlave()
@@ -150,12 +155,13 @@ namespace EveLayoutCopy.ViewModel
             }
         }
 
-        private readonly DelegateCommand _rs;
+        private DelegateCommand _rs;
         public DelegateCommand RemoveSlaveCommand
         {
             get
             {
-                return _rs ?? new DelegateCommand(RemoveSlave);
+                _rs = _rs ?? new DelegateCommand(RemoveSlave);
+                return _rs;
             }
         }
         private void RemoveSlave()
@@ -166,12 +172,13 @@ namespace EveLayoutCopy.ViewModel
             }
         }
 
-        private readonly DelegateCommand _cc;
+        private DelegateCommand _cc;
         public DelegateCommand CopyCommand
         {
             get 
             {
-                return _cc ?? new DelegateCommand(Copy, CanCopy);
+                _cc = _cc ?? new DelegateCommand(Copy, CanCopy);
+                return _cc;
             }
         }
         private void Copy()
@@ -213,8 +220,6 @@ namespace EveLayoutCopy.ViewModel
         {
             using (SWF.OpenFileDialog fileDialog = new SWF.OpenFileDialog())
             {
-                //errorLabel.Text = "";
-
                 fileDialog.InitialDirectory = ProfileDirectory;
                 if (fileDialog.ShowDialog() == SWF.DialogResult.OK)
                 {
