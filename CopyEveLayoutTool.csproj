@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{AF5CC90C-8EAE-49E0-98C5-9809A5D6D887}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>EveLayoutCopy</RootNamespace>
-    <AssemblyName>EveLayoutCopy</AssemblyName>
+    <RootNamespace>CopyEveLayoutTool</RootNamespace>
+    <AssemblyName>CopyEveLayoutTool</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
