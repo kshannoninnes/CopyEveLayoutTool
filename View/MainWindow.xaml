@@ -24,8 +24,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="30"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" Text="{Binding SettingsDirectory}" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,1,0" IsReadOnly="True"/>
-                <Button Grid.Column="1" Content="..." ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch" Click="SelectProfileDirectory" Padding="0" Margin="1,0,0,0"/>
+                <TextBox Grid.Column="0" Text="{Binding ProfileDirectory}" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,1,0" IsReadOnly="True"/>
+                <Button Grid.Column="1" Content="..." ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch" Command="{Binding SelectProfileDirectoryCommand}" Padding="0" Margin="1,0,0,0"/>
             </Grid>
         </StackPanel>
 
@@ -49,11 +49,11 @@
 
                     <Label Grid.Row="0" Grid.Column="0" Content="Core User" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1,0,0,0"/>
                     <TextBox Text="{Binding User}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Margin="0"/>
-                    <Button Grid.Row="0" Grid.Column="3" Content="..." VerticalAlignment="Stretch" Width="29" Height="25" Click="SelectUserMaster"/>
+                    <Button Grid.Row="0" Grid.Column="3" Content="..." VerticalAlignment="Stretch" Width="29" Height="25" Command="{Binding SelectUserMastercommand}"/>
 
                     <Label Grid.Row="2" Grid.Column="0" Content="Core Char" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1,0,0,0"/>
                     <TextBox Text="{Binding Character}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Margin="0"/>
-                    <Button Grid.Row="2" Grid.Column="3" Content="..." VerticalAlignment="Stretch" Width="29" Height="25" Click="SelectCharMaster"/>
+                    <Button Grid.Row="2" Grid.Column="3" Content="..." VerticalAlignment="Stretch" Width="29" Height="25" Command="{Binding SelectCharMasterCommand}"/>
                 </Grid>
             </StackPanel>
         </StackPanel>
@@ -79,9 +79,9 @@
                     <ColumnDefinition Width="50"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="Add Slave" Click="AddSlave"/>
-                <Button Grid.Column="1" Content="Remove Slave" Click="RemoveSlave"/>
-                <Button Grid.Column="3" Content="Copy" Click="Copy"/>
+                <Button Grid.Column="0" Content="Add Slave" Command="{Binding AddSlaveCommand}"/>
+                <Button Grid.Column="1" Content="Remove Slave" Command="{Binding RemoveSlaveCommand}"/>
+                <Button Grid.Column="3" Content="Copy" Command="{Binding CopyCommand}"/>
             </Grid>
         </Grid>
         <Border Grid.Row="3" BorderThickness="0,1,0,0" Margin="0,2,0,0" BorderBrush="#FF8F8585">
