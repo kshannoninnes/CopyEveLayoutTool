@@ -4,22 +4,18 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 
 using SWF = System.Windows.Forms;
+using EveLayoutCopy.ViewModel;
 
 namespace CopyEveLayoutTool
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        private string PROFILE_PATH = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), @"CCP\EVE");
-        public ObservableCollection<string> FilesToOverwrite { get; set; }
-
+        private readonly ProfileData ProfileData;
         public MainWindow()
         {
             InitializeComponent();
-            FilesToOverwrite = new ObservableCollection<string>();
-            DataContext = this;
+            ProfileData = new ProfileData();
+            this.DataContext = ProfileData;
         }
 
         private string SelectFile()
@@ -28,7 +24,7 @@ namespace CopyEveLayoutTool
             {
                 errorLabel.Text = "";
 
-                fileDialog.InitialDirectory = PROFILE_PATH;
+                fileDialog.InitialDirectory = ProfileData.SettingsDirectory;
                 if (fileDialog.ShowDialog() == SWF.DialogResult.OK)
                 {
                     return fileDialog.SafeFileName;
@@ -38,7 +34,7 @@ namespace CopyEveLayoutTool
             }
         }
 
-        private bool FilenameMatches(string filename, string pattern)
+        private bool TextFollowsPattern(string filename, string pattern)
         {
             Regex r = new Regex(pattern);
             Match m = r.Match(filename);
@@ -50,10 +46,9 @@ namespace CopyEveLayoutTool
         {
             using (SWF.FolderBrowserDialog dirDialog = new SWF.FolderBrowserDialog())
             {
-                dirDialog.SelectedPath = PROFILE_PATH;
+                dirDialog.SelectedPath = ProfileData.RootDirectory;
                 dirDialog.ShowDialog();
-                profDirText.Text = dirDialog.SelectedPath;
-                PROFILE_PATH = dirDialog.SelectedPath;
+                ProfileData.SettingsDirectory = dirDialog.SelectedPath;
             }
         }
 
@@ -64,8 +59,8 @@ namespace CopyEveLayoutTool
 
             if (filename != null)
             {
-                if (FilenameMatches(filename, pattern))
-                    coreUserMaster.Text = filename;
+                if (TextFollowsPattern(filename, pattern))
+                    ProfileData.User = filename;
                 else
                     UpdateStatus("Selected file is not a valid account settings file", System.Windows.Media.Brushes.Red);
             }
@@ -78,8 +73,8 @@ namespace CopyEveLayoutTool
 
             if (filename != null)
             {
-                if (FilenameMatches(filename, pattern))
-                    coreCharMaster.Text = filename;
+                if (TextFollowsPattern(filename, pattern))
+                    ProfileData.Character = filename;
                 else
                     UpdateStatus("Selected file is not a valid character settings file", System.Windows.Media.Brushes.Red);
             }
@@ -88,12 +83,12 @@ namespace CopyEveLayoutTool
         private void AddSlave(object sender, RoutedEventArgs e)
         {
             string filename = SelectFile();
+            string pattern = "^(core_(char|user)_)(\\d+[.]dat)$"; // Represents the pattern "core_[user or char]_[one or more integers].dat"
 
             if (filename != null)
             {
-                string pattern = "^(core_(char|user)_)(\\d+[.]dat)$"; // Represents the pattern "core_[user or char]_[one or more integers].dat"
-                if (FilenameMatches(filename, pattern))
-                    FilesToOverwrite.Add(filename);
+                if (TextFollowsPattern(filename, pattern))
+                    ProfileData.SlaveList.Add(filename);
                 else
                     UpdateStatus("Selected file is not a valid account or character settings file", System.Windows.Media.Brushes.Red);
             }
@@ -101,17 +96,17 @@ namespace CopyEveLayoutTool
 
         private void RemoveSlave(object sender, RoutedEventArgs e)
         {
-            if (slaveListView.SelectedItem is string filenameToRemove)
+            if (ProfileData.SelectedSlave is string filenameToRemove)
             {
-                FilesToOverwrite.Remove(filenameToRemove);
+                ProfileData.SlaveList.Remove(filenameToRemove);
             }
         }
 
         private void Copy(object sender, RoutedEventArgs e)
         {
-            bool profileDirSelected = profDirText.Text.Length > 0;
-            bool userMasterSelected = coreUserMaster.Text.Length > 0;
-            bool charMasterSelected = coreCharMaster.Text.Length > 0;
+            bool profileDirSelected = ProfileData.SettingsDirectory.Length > 0;
+            bool userMasterSelected = ProfileData.User.Length > 0;
+            bool charMasterSelected = ProfileData.Character.Length > 0;
 
             if (profileDirSelected && (userMasterSelected || charMasterSelected))
                 CopyProfileData();
@@ -121,36 +116,32 @@ namespace CopyEveLayoutTool
 
         private void CopyProfileData()
         {
-            string newFilename;
+            string masterFilename;
 
-            foreach(string oldFilename in slaveListView.Items)
+            foreach(string slaveFilename in ProfileData.SlaveList)
             {
-                string oldFile = Path.Combine(PROFILE_PATH, oldFilename);
-                if(File.Exists(oldFile))
-                {
-                    if (oldFilename.StartsWith("core_user"))
-                        newFilename = coreUserMaster.Text;
-                    else if (oldFilename.StartsWith("core_char"))
-                        newFilename = coreCharMaster.Text;
-                    else
-                        throw new FileNotFoundException(oldFilename + " is not a valid settings file");
 
-                    string newFile = Path.Combine(PROFILE_PATH, newFilename);
-                    if (File.Exists(newFile))
-                    {
-                        File.Delete(oldFile);
-                        File.Copy(newFile, oldFile);
-                        UpdateStatus("Settings successfully copied!", System.Windows.Media.Brushes.Green);
-                    }
-                    else
-                    {
-                        UpdateStatus("Master file does not exist. Aborting.", System.Windows.Media.Brushes.Red);
-                        break;
-                    }
+                if (slaveFilename.StartsWith("core_user"))
+                    masterFilename = ProfileData.User;
+                else if (slaveFilename.StartsWith("core_char"))
+                    masterFilename = ProfileData.Character;
+                else // Shouldn't be possible given how the app adds slaves, but better safe than sorry
+                    throw new FileNotFoundException(slaveFilename + " is not a valid settings file");
+
+                string masterFile = Path.Combine(ProfileData.SettingsDirectory, masterFilename);
+                string slaveFile = Path.Combine(ProfileData.SettingsDirectory, slaveFilename);
+
+                if (File.Exists(masterFile))
+                {
+                    if(File.Exists(slaveFile))
+                        File.Delete(slaveFile);
+
+                    File.Copy(masterFile, slaveFile);
+                    UpdateStatus("Settings successfully copied!", System.Windows.Media.Brushes.Green);
                 }
                 else
                 {
-                    UpdateStatus("Wrong directory or slave file does not exist. Aborting.", System.Windows.Media.Brushes.Red);
+                    UpdateStatus("Master file does not exist. Aborting.", System.Windows.Media.Brushes.Red);
                     break;
                 }
             }
