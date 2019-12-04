@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EveLayoutCopy.Model
+namespace CopyEveLayoutTool.Model
 {
     class Profile
     {

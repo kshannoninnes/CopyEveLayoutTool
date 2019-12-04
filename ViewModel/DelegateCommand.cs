@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace EveLayoutCopy.Model
+namespace CopyEveLayoutTool.ViewModel
 {
     public class DelegateCommand : ICommand
     {

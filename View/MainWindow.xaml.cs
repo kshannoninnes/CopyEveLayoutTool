@@ -4,18 +4,25 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 
 using SWF = System.Windows.Forms;
-using EveLayoutCopy.ViewModel;
+using CopyEveLayoutTool.ViewModel;
+using CopyEveLayoutTool.Model;
 
 namespace CopyEveLayoutTool
 {
     public partial class MainWindow : Window
     {
-        private readonly ViewModel ProfileData;
         public MainWindow()
         {
             InitializeComponent();
-            ProfileData = new ViewModel();
-            this.DataContext = ProfileData;
+
+            Profile p = new Profile();
+            Status s = new Status();
+
+            this.DataContext = new
+            {
+                status = s,
+                profile = new UI(s, p)
+            };
         }
     }
 }

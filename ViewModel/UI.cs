@@ -1,27 +1,29 @@
 ﻿using System;
 using System.IO;
-using EveLayoutCopy.Model;
+using CopyEveLayoutTool.Model;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
 
 using SWF = System.Windows.Forms;
+using System.Collections.Generic;
 
-namespace EveLayoutCopy.ViewModel
+namespace CopyEveLayoutTool.ViewModel
 {
-    class ViewModel : INotifyPropertyChanged
+    class UI : INotifyPropertyChanged
     {
+        private readonly Status _status;
         private readonly Profile _profile;
 
-        public ViewModel()
+        public UI(Status status, Profile profile)
         {
-            _profile = new Profile();
+            _status = status;
+            _profile = profile;
             SlaveList = new ObservableCollection<string>();
             InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"CCP\EVE");
         }
 
 
-        // TODO Fix UpdateStatus
         // Properties
         public string InitialDirectory { get; }
         public string ProfileDirectory 
@@ -103,11 +105,15 @@ namespace EveLayoutCopy.ViewModel
         {
             try
             {
-                User = SelectMasterFile("^(core_user_)(\\d+[.]dat)$") ?? User;
+                string pattern = "^(core_user_)(\\d+[.]dat)$";
+                string errorText = "is not a valid account settings file.";
+                PatternMatch pm = new PatternMatch(pattern, errorText);
+
+                User = SelectMasterFile(pm) ?? User;
             }
             catch (ArgumentException e)
             {
-                UpdateStatus(e.Message, System.Windows.Media.Brushes.Red);
+                _status.Set(e.Message, Status.Type.ERROR);
             }
         }
 
@@ -124,11 +130,15 @@ namespace EveLayoutCopy.ViewModel
         {
             try
             {
-                Character = SelectMasterFile("^(core_char_)(\\d+[.]dat)$") ?? Character;
+                string pattern = "^(core_char_)(\\d+[.]dat)$";
+                string errorText = "is not a valid character settings file.";
+                PatternMatch pm = new PatternMatch(pattern, errorText);
+
+                Character = SelectMasterFile(pm) ?? Character;
             }
             catch (ArgumentException e)
             {
-                UpdateStatus(e.Message, System.Windows.Media.Brushes.Red);
+                _status.Set(e.Message, Status.Type.ERROR);
             }
         }
 
@@ -143,15 +153,18 @@ namespace EveLayoutCopy.ViewModel
         }
         private void AddSlave()
         {
-            string filename = SelectFile();
+            List<string> filenames = SelectFile(multiSelect: true);
             string pattern = "^(core_(char|user)_)(\\d+[.]dat)$"; // Represents the pattern "core_[user or char]_[one or more integers].dat"
 
-            if (filename != null)
+            foreach(string filename in filenames)
             {
-                if (TextFollowsPattern(filename, pattern))
-                    SlaveList.Add(filename);
-                else
-                    UpdateStatus("Selected file is not a valid account or character settings file", System.Windows.Media.Brushes.Red);
+                if (filename != null)
+                {
+                    if (TextFollowsPattern(filename, pattern))
+                        SlaveList.Add(filename);
+                    else
+                        _status.Set($"{filename} is not a valid account or character settings file", Status.Type.ERROR);
+                }
             }
         }
 
@@ -187,7 +200,7 @@ namespace EveLayoutCopy.ViewModel
 
             foreach (string slaveFilename in SlaveList)
             {
-                masterFilename = (slaveFilename.StartsWith("core_user")) ? User : Character;
+                masterFilename = slaveFilename.StartsWith("core_user") ? User : Character;
 
                 if (masterFilename != null)
                 {
@@ -203,11 +216,13 @@ namespace EveLayoutCopy.ViewModel
                     }
                     else
                     {
-                        UpdateStatus("Master file does not exist. Aborting.", System.Windows.Media.Brushes.Red);
+                        _status.Set($"File {masterFilename} does not exist. Aborting.", Status.Type.ERROR);
                         break;
                     }
                 }
             }
+
+            _status.Set($"Successfully copied settings!", Status.Type.OK);
         }
         private bool CanCopy()
         {
@@ -216,33 +231,43 @@ namespace EveLayoutCopy.ViewModel
 
 
         // Utility methods
-        private string SelectFile()
+        private List<string> SelectFile(bool multiSelect = false)
         {
+            List<string> files = new List<string>();
+
             using (SWF.OpenFileDialog fileDialog = new SWF.OpenFileDialog())
             {
+                fileDialog.Multiselect = multiSelect;
                 fileDialog.InitialDirectory = ProfileDirectory;
+
                 if (fileDialog.ShowDialog() == SWF.DialogResult.OK)
                 {
-                    return fileDialog.SafeFileName;
+                    foreach(string file in fileDialog.SafeFileNames)
+                    {
+                        files.Add(file);
+                    }
                 }
-                else
-                    return null;
+
+                return files;
             }
         }
 
-        private string SelectMasterFile(string pattern)
+        private string SelectMasterFile(PatternMatch pm)
         {
-            string filename = SelectFile();
+            List<string> filenames = SelectFile();
 
-            if (filename != null)
+            foreach(string filename in filenames)
             {
-                if (TextFollowsPattern(filename, pattern))
-                    return filename;
-                else
-                    throw new ArgumentException("Selected file is not a valid settings file");
+                if (filename != null)
+                {
+                    if (TextFollowsPattern(filename, pm.Pattern))
+                        return filename;
+                    else
+                        throw new ArgumentException($"{filename} " + pm.ErrorText);
+                }
             }
-            else
-                return null;
+
+            return null;
         }
 
         private bool TextFollowsPattern(string filename, string pattern)
@@ -251,13 +276,6 @@ namespace EveLayoutCopy.ViewModel
             Match m = r.Match(filename);
 
             return m.Success;
-        }
-
-        private void UpdateStatus(string message, System.Windows.Media.SolidColorBrush color)
-        {
-            //errorLabel.Foreground = color;
-            //errorLabel.Text = message;
-            Console.WriteLine(message);
         }
 
 
